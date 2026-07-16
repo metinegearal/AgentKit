@@ -2,7 +2,6 @@
 "use server"
 
 import { lamaticClient } from "../lib/lamatic-client"
-import lamaticConfig from "../../lamatic.config"
 
 // ---------------------------------------------------------
 // FLOW 1: Generate Text/Context
@@ -13,8 +12,9 @@ export async function generateTextContext(
   words: string[]
 ) {
   try {
-    const workflowId = lamaticConfig.steps.find((s) => s.id === "lesson")?.workflowId;
-    if (!workflowId) throw new Error("Lesson workflow not found in lamatic.config");
+    // Read directly from environment variables to bypass Next.js external directory build limits
+    const workflowId = process.env.NEXT_PUBLIC_LESSON_FLOW_ID;
+    if (!workflowId) throw new Error("NEXT_PUBLIC_LESSON_FLOW_ID not found in environment variables");
 
     const query = `
       query ExecuteWorkflow($workflowId: String!, $context: String, $level: String, $words: [String]) {
@@ -55,8 +55,8 @@ export async function generateQuestions(
   counts: { grammar: number; vocabulary: number; context: number; kanji: number }
 ) {
   try {
-    const workflowId = lamaticConfig.steps.find((s) => s.id === "quiz")?.workflowId;
-    if (!workflowId) throw new Error("Quiz workflow not found in lamatic.config");
+    const workflowId = process.env.NEXT_PUBLIC_QUIZ_FLOW_ID;
+    if (!workflowId) throw new Error("NEXT_PUBLIC_QUIZ_FLOW_ID not found in environment variables");
 
     const query = `
       query ExecuteWorkflow(
