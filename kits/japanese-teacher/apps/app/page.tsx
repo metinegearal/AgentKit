@@ -210,9 +210,12 @@ export default function Home() {
     questionsList.forEach((q: any) => {
       max += q.points || 1;
       const uAns = (userAnswers[q.question_id] || "").trim();
-      const correctAns = (q.answer || "").trim();
       
-      if (uAns === correctAns) {
+      // FIX: Map the AI's short answer "(a)" to the full option text "(a) 猫"
+      const correctFullOption = q.options?.find((opt: string) => opt.startsWith(q.answer)) || q.answer;
+      
+      // Now strictly compare full text to full text!
+      if (uAns === correctFullOption.trim()) {
         score += q.points || 1;
       }
     });
@@ -439,7 +442,8 @@ export default function Home() {
                       {(quizData.quiz || quizData.Questions || quizData.questions).map((q: any, idx: number) => {
                         const isSubmitted = quizResult !== null;
                         const userAnswer = userAnswers[q.question_id];
-                        const isCorrect = (userAnswer || "").trim() === (q.answer || "").trim();
+                        const correctFullOption = q.options?.find((opt: string) => opt.startsWith(q.answer)) || q.answer;
+                        const isCorrect = (userAnswer || "").trim() === correctFullOption.trim();
 
                         return (
                           <div key={q.question_id} className="mb-8 p-4 rounded-lg bg-gray-50 border border-gray-200">
